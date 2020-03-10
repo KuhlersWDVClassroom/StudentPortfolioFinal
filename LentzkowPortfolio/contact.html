@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Lentzkow's Portfolio</title>
+<meta charset="utf-8">
+<link href="cssPortfolio.css" rel="stylesheet">
+</head>
+<main>
+	<header>
+		<h1>Christian Lentzkow</h1>
+	</header>
+		<style>
+		ul {
+		  list-style-type: none;
+		  margin: 0;
+		  padding: 0;
+		  overflow: hidden;
+		  background-color: #333;
+		}
+		
+		li {
+		  float: left;
+		}
+		
+		li a {
+		  display: block;
+		  color: white;
+		  text-align: center;
+		  padding: 14px 16px;
+		  text-decoration: none;
+		}
+		
+		
+		li a:hover:not(.active) {
+  background-color: #111;
+}
+
+.active {
+  background-color: #4CAF50;
+}
+		
+		</style>
+		</head>
+		<body>
+		
+		<ul id="nav">
+		  <li><a href="index.html">Home</a></li>
+		  <li><a href="education.html">Education</a></li>
+		  <li><a href="expierence.html">Expierence</a></li>
+		  <li><a href="interests.html">Interests</a></li>
+		  <li><a class="active" href="contact.html">Contact Me</a></li>
+		</ul>
+</head>
+
+<h1>Contact Form</h1>
+<form method="get">
+<fieldset><legend>Contact Me</legend>
+    
+    <p>
+        First Name: <input type="text" name="fname" id="fname"><br>
+        Last Name: <input type="text" name="lname" id="lname"><br>
+        Email: <input type="text" name="email" id="email"> <br>
+        Comments:<br>
+        <textarea name="comments" id="comments" rows="4" cols="40"></textarea><br><br>
+        <input type="submit">
+    </p>
+</fieldset>
+
+    
+</body>
+</html> 

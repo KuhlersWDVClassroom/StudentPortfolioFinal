@@ -1,0 +1,29 @@
+main {
+    text-align: center;
+}
+
+
+ul {
+    text-align: center;
+    list-style-position: inside;
+}
+ body {
+    background-color: rgb(75, 165, 196);
+}
+
+
+
+#nav {
+    width:750px;
+    margin:0 auto;
+    list-style:none;
+    }
+    #nav li {
+    float:center;
+    }
+    #nav a {
+    display:block;
+    text-align:center;
+    text-decoration:none; 
+    }
+
