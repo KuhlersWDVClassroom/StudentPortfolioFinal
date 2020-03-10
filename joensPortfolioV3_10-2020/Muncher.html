@@ -1,0 +1,146 @@
+<html>
+<head>
+<title>Muncher</title>
+<style type = "text/css">
+   body {
+   background-color: grey;
+margin: 0px;
+}
+
+h1 {color:black; font-size:40px; position: absolute; top: 0px; left: 1050px;}
+
+</style>
+</head>
+
+<body onload= "Vars(0)">
+
+<script type = "text/javascript">
+
+function Vars(A){
+   var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+document.documentElement.style.overflow = 'hidden'; 
+drawing.width = document.body.clientWidth; //document.width is obsolete
+   drawing.height = document.body.clientHeight; //document.height is obsolete
+con.scale(drawing.width/1024,drawing.height/768);
+
+if(A == 0){
+Level = 0
+}
+
+Pac = {
+    X : [1024/2],
+Y : [768/2],
+Size : [10]
+}
+
+Pac.X[0] = 1024/2
+Pac.Y[0] = 768/2
+
+Point = {
+    X : [0],
+Y : [0],
+Type : [0]
+}
+
+MousePX = 0
+MousePY = 0
+MaxP = 255
+Time = 100
+
+i = 0
+while(i < MaxP){
+Point.X[i] = Math.floor((Math.random()*960)/8)*8+32
+Point.Y[i] = Math.floor((Math.random()*704)/8)*8+32
+//Point.Type[i] = Math.floor((Math.random()*3)/2)
+Point.Type[i] = 0
+i++
+}
+
+DrawMapPlayer()
+}
+
+function DrawMapPlayer(){
+   var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+
+//clear background
+   con.fillStyle = "black";
+   con.fillRect(0,0, 1024, 768)
+con.font = "25pt sans-serif"; 
+con.fillStyle = "white"; 
+con.fillText(Pac.Size[0]*4,32,32)
+
+
+if(Level > 7){Level = 0}
+if(Level == 0){Color = "#FF0000"; DiffColor = "#FF8F00";}
+if(Level == 1){Color = "#FF8F00"; DiffColor = "#FFFF00";}
+if(Level == 2){Color = "#FFFF00"; DiffColor = "#00FF00";}
+if(Level == 3){Color = "#00FF00"; DiffColor = "#00FFFF";}
+if(Level == 4){Color = "#00FFFF"; DiffColor = "#0000FF";}
+if(Level == 5){Color = "#0000FF"; DiffColor = "#FF00FF";}
+if(Level == 6){Color = "#FF00FF"; DiffColor = "#FFFFFF";}
+if(Level == 7){Color = "#FFFFFF"; DiffColor = "#FF0000";}
+
+//Draw Points
+i = 0
+while(i < MaxP){
+
+if(Point.Type[i] == 0){
+if(Pac.X[0]+Pac.Size[0] > Point.X[i]){if(Pac.X[0]-Pac.Size[0] < Point.X[i]){if(Pac.Y[0]+Pac.Size[0] > Point.Y[i]){if(Pac.Y[0]-Pac.Size[0] < Point.Y[i]){Pac.Size[0] += 0.25; Point.Type[i] = 2}}}}
+}
+
+if(Point.Type[i] == 1){
+if(Pac.X[0]+Pac.Size[0] > Point.X[i]){if(Pac.X[0]-Pac.Size[0] < Point.X[i]){if(Pac.Y[0]+Pac.Size[0] > Point.Y[i]){if(Pac.Y[0]-Pac.Size[0] < Point.Y[i]){Pac.Size[0] = 16; Point.Type[i] = 2}}}}
+}
+
+if(Point.Type[i] == 0){
+con.fillStyle = Color
+con.fillRect(Point.X[i],Point.Y[i], 8, 8)
+}
+
+if(Point.Type[i] == 1){
+con.fillStyle = DiffColor
+con.fillRect(Point.X[i],Point.Y[i], 8, 8)
+}
+
+i++
+}
+
+//CheckAllPoint
+A = 0
+B = 0
+while(A < MaxP){
+if(Point.Type[A] == 1 || Point.Type[A] == 2){B++}
+
+if(B == MaxP){Level += 1;Vars(1)}
+
+A++
+}
+
+//Draw Pac Man
+con.fillStyle = Color
+con.beginPath();
+con.arc(Pac.X,Pac.Y,Pac.Size,0,2*Math.PI);
+con.fill();
+
+document.onmousemove = function(event)
+{
+MousePX = Math.floor(event.clientX/8)*8*(1024/drawing.width)
+MousePY = Math.floor(event.clientY/8)*8*(768/drawing.height)
+
+if(MousePX != Pac.X[0]){Pac.X[0] = MousePX}
+if(MousePY != Pac.Y[0]){Pac.Y[0] = MousePY}
+}
+
+setTimeout(function(){DrawMapPlayer(0)},10);
+}
+  </script>
+
+  <canvas id = "drawing"
+    height = "768"
+    width = "1024">
+   <p>Canvas not supported!</p>
+  </canvas>
+  </body>
+  </html>

@@ -1,0 +1,14 @@
+Timer score? 
+
+Acheivement screen?
+Acheivements / Medals
+	One for every Size dungeon complete
+		3x3 Medal, 4x4 Medal, ect to 30x30
+		Coins collected
+			100, 1000, 10000
+		Levels completed
+			10,20,25 Ect
+
+
+
+	
