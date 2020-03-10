@@ -1,0 +1,104 @@
+
+body { 
+    
+    background-image: url(photos/Background1.jpg);
+    color: black;
+       }
+
+
+
+
+
+h1 { 
+    Background-color: #5fa2e0
+    ; color: #e6e6fa; text-align: center; border-style: solid; }
+    
+
+h2 { 
+    background-color: #9eeee3;
+     color: #191970; text-align: center; border-style: solid; }
+
+     #pic { text-align: center}
+
+     nav {text-align: center }
+
+     blockquote {text-align: center}
+
+h3 { 
+    background-color: #9eeee3;
+    color: #191970; 
+    text-align: center;
+    border-style: solid;
+    }
+
+.box a{
+background-color: #5fa2e0;
+ color: #191970;
+ border: 5px solid #5fa2e0;
+ text-decoration: none}
+ 
+#active {
+background-color: #5fa2e0;
+ color: #e6e6fa;
+  border: 5px solid #5fa2e0}
+
+.box a:hover {
+    background-color: #5fa2e0;
+    color: #e6e6fa;
+    border: 5px solid #5fa2e0}
+
+p { padding-left: 20%;
+    padding-right: 20%;
+text-align: center;
+ }
+
+#ed {
+    
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+hr {border-style: dashed;}
+
+.bulletText p{
+ padding-left: 5%;
+ padding-right: 5%;
+}
+
+.float_right2 {
+    float: left;
+    padding-right: 10%;
+}
+
+.float_left2 {
+    float:left;
+    padding-left: 30%;}
+
+.float_left1 {
+    float: left;
+     padding-right: 5%;}
+
+.float_right1 {
+    float: left;
+     padding-right: 1%;} 
+
+.text {text-align: center;} 
+
+.fig {text-align: center;}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#eds {
+    float: right;
+}
+
+.text {
+    text-align: center;
+
+}
