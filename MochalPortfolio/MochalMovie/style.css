@@ -1,0 +1,63 @@
+.column {
+    float: left;
+    width: 33%;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.leftColumnSpacing {
+    margin-bottom: 75px;
+}
+
+.rightColumnSpacing {
+    margin-bottom: 50px;
+}
+
+.fiveColumn {
+    float: left;
+    width: 20%;
+}
+
+body {
+    background-color: #D4E6F1;
+    color: #191970;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+header {
+    color: black;
+}
+
+/* For the Nav Bar: */
+.box a {
+    color: #000000;
+    text-decoration: none;
+    margin-right: 10px;
+    background-color: #E59866;
+    border: 5px solid #E59866;
+    font-weight: bold;
+}
+
+.box a:hover {
+    background-color: #F7DC6F;
+    border: 5px solid #F7DC6F;
+}
+
+#active {
+    background-color: #EC7063;
+    border: 5px solid #EC7063;
+    
+}
+
+nav {
+    text-align: center;
+}
+
+.center p {
+    padding-right: 20%;
+    padding-left: 20%;
+}

@@ -1,0 +1,172 @@
+body {
+    background-color: #D4E6F1;
+    color: #191970;
+}
+
+h1 {
+    background-color: #76D7C4;
+    color: #191970;
+    text-align: center;
+    padding: 2px;
+    border: 4px solid black;
+}
+
+h2 {
+    background-color: #aeaed4;
+    color: #191970;
+    text-align: center;
+}
+
+h3 {
+    background-color: #AED6F1;
+    color: #191970;
+    text-align: center;
+}
+
+/*  This is a custom heading which will be used to start every page. (basically an H1) */
+h6 {
+    display: block;
+    font-size: 2em;
+    margin-top: 0.67em;
+    margin-bottom: 0.67em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+    background-color: #76D7C4;
+    color: #191970;
+    text-align: center;
+}
+
+#pic {
+    text-align: center;
+}
+
+
+/* Start of Nav Bar */
+nav {
+    text-align: center;
+}
+
+.box a {
+    color: #000000;
+    text-decoration: none;
+    margin-right: 15px;
+    background-color: #E59866;
+    border: 5px solid #E59866;
+    font-weight: bold;
+    border-radius: 25px;
+}
+
+.navButton {
+    color: #000000;
+    text-decoration: none;
+    margin-right: 15px;
+    background-color: #E59866;
+    border: 5px solid #E59866;
+    font-weight: bold;
+    border-radius: 25px;
+}
+
+.box a:hover {
+    background-color: #F7DC6F;
+    border: 5px solid #F7DC6F;
+}
+
+#active {
+    background-color: #EC7063;
+    border: 5px solid #EC7063;
+    
+}
+
+.boxSub a {
+    color: #000000;
+    text-decoration: none;
+    margin-right: 15px;
+    background-color: #E59866;
+    border: 3px solid #E59866;
+    font-weight: bold;
+    border-radius: 15px;
+}
+
+.boxSub a:hover {
+    background-color: #F7DC6F;
+    border: 3px solid #F7DC6F;
+}
+
+/* Start of Dropdown Menu Stuff */
+
+
+
+/* End of Dropdown Menu Stuff */
+p {
+    padding-left: 20%;
+    padding-right: 20%;
+    font-size: 17px;
+}
+
+ul{
+    padding-left: 20%;
+    padding-right: 20%;
+}
+
+ol{
+    padding-left: 20%;
+    padding-right: 20%;
+}
+
+.column {
+    float: left;
+    width: 21.11%;
+    font-family: sans-serif;
+}
+
+.projectColumn {
+    float: left;
+    width: 30%;
+    font-family: sans-serif;
+}
+
+.columnDefault {
+    display: inline-block;
+}
+
+.column5 {
+    float: left;
+    width: 30%;
+}
+
+#left {
+    margin-left: 1.5%;
+}
+
+#right {
+    margin-right: 3.333333323%;
+}
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.linebreak {
+    background-color: #AED6F1;
+    color: #191970;
+    text-align: center;
+}
+
+.ignore p {
+    padding-left: 0%;
+    padding-right: 0%;
+}
+.ignore ul {
+    padding-left: 0%;
+    padding-right: 0%;
+}
+.ignore ol {
+    padding-left: 0%;
+    padding-right: 0%;
+}
+
+.classIndent p{
+    padding-left: 5%;
+}
