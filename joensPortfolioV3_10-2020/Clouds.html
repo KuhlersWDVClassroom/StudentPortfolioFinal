@@ -1,0 +1,138 @@
+<html>
+<head>
+<title>Clouds</title>
+<style type = "text/css">
+   body {
+   background-color: grey;
+margin: 0px;
+}
+
+h1 {color:black; font-size:40px; position: absolute; top: 0px; left: 1050px;}
+h2 {color:black; font-size:25px; position: absolute; top: 45px; left: 1025px; width: 550}
+div.container2 {color:black; font-size:0px; position: absolute; top: 0px; left: 0px;}
+
+</style>
+</head>
+
+<body onload= "Vars()">
+
+<script type = "text/javascript">
+
+function Vars(){
+   var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+
+document.documentElement.style.overflow = 'hidden'; 
+   var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+drawing.width = document.body.clientWidth; //document.width is obsolete
+   drawing.height = document.body.clientHeight; //document.height is obsolete
+
+con.fillStyle = "black";
+   con.strokeStyle = "white";
+   con.fillRect(0,0, drawing.width, drawing.height)
+   con.font = "16pt sans-serif";
+   con.scale(drawing.width/1024,drawing.height/768);
+
+Cull = 0
+CullZ = 0
+YLV = 0
+Yos = 0
+Score = 0
+
+Jp = 0
+Time = 10
+MaxC = 255000
+
+Player = {
+X : [1024/2],
+Y : [668]
+}
+
+Cloud = {
+X : [0],
+Y : [0],
+Speed : [0],
+Type : [0]
+}
+
+i = 0
+while(i < MaxC){
+Seed = Math.random()
+Cloud.X[i] = Math.floor(Seed*(1024-96))
+Cloud.Y[i] = -96*i+604
+Cloud.Speed[i] = Math.floor(Seed*10+2)/2
+Cloud.Type[i] = 0
+i++
+}
+
+Draw()
+}
+
+function Draw(){
+   var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+
+con.font = "30pt sans-serif";
+BC = "#00AFFF"
+con.fillStyle = BC
+con.fillRect(0,0,1024,768)
+con.fillStyle = "#000000"
+con.fillRect(0,700+Yos,1024,68)
+con.fillStyle = "#00FF00"
+con.fillRect(0+3,700+Yos+3,1024-6,68-6)
+
+i = YLV-2
+while(i < YLV+10){
+Cloud.X[i] += Cloud.Speed[i]
+
+if(Cloud.Type[i] == 0){
+if(Cloud.X[i] > 1024-96){Cloud.Speed[i] = Cloud.Speed[i]*-1}
+if(Cloud.X[i] < 0){Cloud.Speed[i] = Cloud.Speed[i]*-1}
+}
+
+Offset = 3
+con.fillStyle = "#000000"
+con.fillRect(Cloud.X[i],Cloud.Y[i]+Yos,96,32)
+con.fillStyle = "#FFFFFF"
+con.fillRect(Cloud.X[i]+Offset,Cloud.Y[i]+Offset+Yos,96-Offset*2,32-Offset*2)
+
+con.fillStyle = "#000000"
+con.fillRect(Player.X[0],Player.Y[0]+Yos,32,32)
+con.fillStyle = "#FF0000"
+con.fillRect(Player.X[0]+Offset,Player.Y[0]+Offset+Yos,32-Offset*2,32-Offset*2)
+
+i++
+}
+
+con.fillStyle = "#000000"
+con.fillText( "Score: " + Score, 32, 64)
+
+//Cull Det
+if(Cloud.X[YLV]+96 >= Player.X[0]+2 && Cloud.X[YLV] <= Player.X[0]+30 && Cloud.Y[YLV] >= Player.Y[0]+16){Cull = 1}else{Cull = 0}
+if(Cull == 0){
+if(Player.Y[0] < 668){YLV = 0; Player.Y[0] += 4}else{if(Jp == 1){Score = Math.floor(Yos/96); Jp = 0}}
+
+i = 255
+while(i >= 0){
+if(Cloud.X[i]+96 >= Player.X[0]+2 && Cloud.X[i] <= Player.X[0]+30 && Cloud.Y[i] >= Player.Y[0]+16){Cull = 1; YLV = i; i = 0}else{Cull = 0}
+i+=-1
+}
+
+}
+if(Cull == 1){if(Player.Y[0] < Cloud.Y[YLV]-32){Cull = 2; Player.Y[0] += 4}else{Player.Y[0] = Cloud.Y[YLV]-32}}
+if(Cull == 1){Player.X[0] += Cloud.Speed[YLV]; if(Jp == 1){Score = YLV+1 ; Jp = 0}}
+
+document.onclick = function(event){if(Jp == 0){Jp = 1; if(Cull == 1){YLV += 1}; Player.Y[0] += -96}}
+setTimeout(function(){if(Yos != 96*YLV){if(Yos < 96*YLV){Yos += 1}else{Yos += -4}}Draw()},Time);
+}
+
+  </script>
+
+  <canvas id = "drawing"
+    height = "768"
+    width = "1024">
+   <p>Canvas not supported!</p>
+  </canvas>
+  </body>
+  </html>

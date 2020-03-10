@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Dunger</title>
+<script src="Cookie.js"></script>
+<script src="Level.js"></script>
+<script src="Control.js"></script>
+<script src="Drawing.js"></script>
+<script src="Gen.js"></script>
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+
+<body onload="ShowStats()" onresize="ReSize()">
+
+<!Stats>
+<div id="Main3">
+<h3 id="Level" style="float:left"></h3>
+<h3 id="Coin" style="float:right"></h3>
+</div>
+
+<!Main Menu>
+<div class="Main" id="Main">
+
+<img id="Logo" width="100%" height="100" src="Img/Logo.png" alt="Puzzle">
+<h2>Created by: Alex Joens</h2>
+<div class="box2" style="float:left" onclick="Level()"><h3 style="color:#000000">Custom dungeon</h3></div>
+<div class="box2" style="float:right" onclick="RanPreStart()"><h3 style="color:#000000">Random dungeon</h3></div>
+</div>
+
+<!Custom Menu>
+<div class="Main2" id="Main2">
+<h2>Dungeon settings</h2>
+<h4>Size</h4>
+<h5 style="float: left">Small</h5>
+<h5 style="float: right">Large</h5>
+<input type="range" min="3" max="30" value="10" class="slider" id="Size">
+<h4>Difficulty</h4>
+<h5 style="float: left">Easy</h5>
+<h5 style="float: right">Hard</h5>
+<input type="range" min="0" max="1" value="0" class="slider" id="Diff">
+<h4>Mode</h4>
+<h5 style="float: left">Gather</h5>
+<h5 style="float: right">Explore</h5>
+<input type="range" min="0" max="1" value="0" class="slider" id="Mode">
+<div class="box" style="float:left" onclick="PreStart()"><h3 style="color:#000000">Play</h3></div>
+</div>
+
+<div class="Main4" id="Main4">
+<h1>Congratulations</h1>
+<h2>Press any key to continue</h2>
+</div>
+
+<!ItemMenu>
+<div class="pic">
+<img id="Sword" width="64" height="64" src="Img/Sword.png" alt="Puzzle">
+<img id="Wand" width="64" height="64" src="Img/Wand.png" alt="Puzzle">
+<img id="KEYS" width="64" height="64" src="Img/Key.png" alt="Puzzle">
+<img id="Torch" width="64" height="64" src="Img/Torch.png" alt="Puzzle">
+<img id="Shovel" width="64" height="64" src="Img/Shovel.png" alt="Puzzle">
+<img id="Pick" width="64" height="64" src="Img/Pick.png" alt="Puzzle">
+</div>
+
+<canvas id = "drawing"
+    height = "768"
+    width = "768">
+   <p>Canvas not supported!</p>
+  </canvas>
+</body>
+
+</html>

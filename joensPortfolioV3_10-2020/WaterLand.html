@@ -1,0 +1,944 @@
+<html>
+  <head>
+  <title>Water Land</title>
+
+  <style type = "text/css">
+   body {background-color: grey; margin: 0px;}
+h1 {color:black; font-size:42px; position: absolute; top: 0px; left: 1050px;}
+  </style>
+
+<script src="Perlin.js"></script>
+  <script type = "text/javascript">
+
+   function GenWorld(){
+document.documentElement.style.overflow = 'hidden'; 
+   var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+drawing.width = document.body.clientWidth; //document.width is obsolete
+   drawing.height = document.body.clientHeight; //document.height is obsolete
+
+con.fillStyle = "black";
+   con.strokeStyle = "white";
+   con.fillRect(0,0, drawing.width, drawing.height)
+   con.font = "16pt sans-serif";
+
+con.scale(drawing.width/1024,drawing.height/768);
+//con.scale(1024/drawing.width,768/drawing.height);
+//con.scale(2,2);
+
+Block = {
+    X : [0],
+    Y : [0],
+    Z : [0],
+    ID : [0],
+C : [0]
+}
+
+Player = {
+    X : [1024/2],
+    Y : [768/2],
+    Z : [0],
+    Move : [0,0,0,0,0,0,0,0],
+    Hp : [0],
+    Biome : [0],
+    BlockID : [0]
+}
+
+NPC = {
+    X : [1024/2],
+    Y : [768/2],
+    Z : [0],
+}
+
+Wiz = {
+    X : [1024/2],
+    Y : [768/2],
+    Z : [0],
+}
+
+EN = {
+    X : [1024/2],
+    Y : [768/2],
+    Z : [0],
+}
+
+Score = 0
+MaxScore = 0;
+Time = 100
+SelOP = 2
+MaxR = 64
+//Offset = Math.floor((1/(0.003*MaxR)))
+//Xos = (64*MaxR-256-64-64-64-64)*(Offset/32)
+//Yos = (64*MaxR-256-64-64-64)*(Offset/32)
+Xos = 0
+Yos = 0
+OrgXos = 0
+OrgYos = 0
+Offset = 32
+
+MOffset = 8
+MXos= 0
+MYos = 0
+
+MID = 0
+SelZ = 0
+Dir = 0
+
+message = 0
+
+//Items
+Dirt = 0
+Sand = 0
+Snow = 0
+
+con.strokeStyle = "white";
+CenterX = 1024/2
+CenterY = 768/2
+
+X = -MaxR*64
+Y = -MaxR*64
+Z = 0
+
+i = 0
+while(X < MaxR*64){
+i++
+ID = Math.floor(noise.simplex2((CenterX+X) / 320,(CenterY+Y) / 320)*5);
+//if(ID > 0){Block.Z[i] =  Math.floor(-ID*16)/2}else{Block.Z[i] = 16}
+
+X+= 64
+
+if(X== MaxR*64){X=-MaxR*64+32, Y+= 16}
+if(X== MaxR*64+32){X=-MaxR*64, Y+= 16}
+if(Y== MaxR*64){X = MaxR*64}
+
+Block.X[i] = CenterX+X
+Block.Y[i] = CenterY+Y
+if(ID > 0){Block.Z[i] = 0}else{Block.Z[i] = 16}
+Block.ID[i] = ID
+if(Block.ID[i] == 0){if(Block.X[i] == Player.X[0]){if(Block.Y[i] == Player.Y[0]+32){Block.ID[i] = 4}}}
+}
+
+MaxBlocks = i
+GenLandNew()
+}
+
+function GenLandNew(){
+   var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+
+A = 0
+while(A < MaxBlocks){
+
+if(Block.ID[A] > 0){
+Biome = Math.floor(noise.simplex2((-CenterX+Block.X[A]) / 5000, (-CenterY+Block.Y[A]) / 5000)*1.5+2.5)
+Block.ID[A] = Biome;
+Block.C[A] =  Math.floor(noise.simplex2((A) / 1.25,(A) / 1.25)*4);
+if(Block.C[A] == 1){MaxScore++;}
+}
+else{
+Block.ID[A] = 0;
+}
+
+A++
+}
+
+i = 0
+A = 0
+while(A < MaxR){
+B = Math.floor(noise.simplex2((CenterX+Block.X[A]+10*i) / 1.25, (-CenterY+Block.Y[A]) / 1.25+10*i)*(MaxBlocks/2)+(MaxBlocks/2))
+if(Block.ID[B] > 0){Block.C[B] = 100; A++}else{i++;}
+}
+
+i = 0
+A = 0
+while(A < MaxR){
+B = Math.floor(noise.simplex2((-CenterX+Block.X[A]+10*i) / 1.25, (CenterY+Block.Y[A]) / 1.25+10*i)*(MaxBlocks/2)+(MaxBlocks/2))
+if(Block.ID[B] > 0){Block.C[B] = 200; A++}else{i++;}
+}
+
+DrawBlocks()
+ResetMouseFunc()
+ResetKeyFunc()
+}
+
+document.oncontextmenu = function(event){
+return false
+}
+
+function ResetMouseFunc(){
+document.onmousedown = function(event){
+if(event.button == 0){MID = 1}
+if(event.button == 1){DrawALLBlocks(1)}
+if(event.button == 2){MID = 0}
+
+if(MID == 0){
+if(Dir == 3){SelX = Player.X[0]+32,SelY = Player.Y[0]+16}
+if(Dir == 2){SelX = Player.X[0]-32,SelY = Player.Y[0]+16}
+if(Dir == 1){SelX = Player.X[0]-32,SelY = Player.Y[0]+48}
+if(Dir == 0){SelX = Player.X[0]+32,SelY = Player.Y[0]+48}
+}
+
+if(MID == 1){
+if(Dir == 0){SelX = Player.X[0]+32,SelY = Player.Y[0]+16}
+if(Dir == 1){SelX = Player.X[0]-32,SelY = Player.Y[0]+16}
+if(Dir == 2){SelX = Player.X[0]-32,SelY = Player.Y[0]-16}
+if(Dir == 3){SelX = Player.X[0]+32,SelY = Player.Y[0]-16}
+}
+
+if(event.button != 1){
+MovePlayer()
+DrawBlocks()
+DrawPlayer()
+}
+
+if(Dir == 0){SelX = Player.X[0]+32,SelY = Player.Y[0]+16}
+if(Dir == 1){SelX = Player.X[0]-32,SelY = Player.Y[0]+16}
+if(Dir == 2){SelX = Player.X[0]-32,SelY = Player.Y[0]-16}
+if(Dir == 3){SelX = Player.X[0]+32,SelY = Player.Y[0]-16}
+MID = 1
+DrawMouse()
+//DrawInfo()
+}
+
+}
+
+function ResetKeyFunc(){
+document.onkeydown = function(event){
+message = 0
+//if (event.keyCode == 32 || event.keyCode == 17){if(MID == 0){MID = 1} else {MID = 0}}
+
+//Up
+if(event.keyCode == 83 || event.keyCode == 40){Dir = 0}
+//Left
+if(event.keyCode == 65 || event.keyCode == 37){Dir = 1}
+//Down
+if(event.keyCode == 87 || event.keyCode == 38){Dir = 2}
+//Right
+if(event.keyCode == 68 || event.keyCode == 39){Dir = 3}
+
+if(MID == 0){
+if(Dir == 3){SelX = Player.X[0]+32,SelY = Player.Y[0]+16}
+if(Dir == 2){SelX = Player.X[0]-32,SelY = Player.Y[0]+16}
+if(Dir == 1){SelX = Player.X[0]-32,SelY = Player.Y[0]+48}
+if(Dir == 0){SelX = Player.X[0]+32,SelY = Player.Y[0]+48}
+}
+
+if(MID == 1){
+if(Dir == 0){SelX = Player.X[0]+32,SelY = Player.Y[0]+16}
+if(Dir == 1){SelX = Player.X[0]-32,SelY = Player.Y[0]+16}
+if(Dir == 2){SelX = Player.X[0]-32,SelY = Player.Y[0]-16}
+if(Dir == 3){SelX = Player.X[0]+32,SelY = Player.Y[0]-16}
+}
+
+DrawBlocks()
+DrawMouse()
+
+//if (event.keyCode == 69 || event.keyCode == 16){
+//SelOP += 1
+//if(SelOP > 3){SelOP = 1}
+//DrawInfo()
+//}
+
+//if(event.keyCode == 81 || event.keyCode == 13){
+}
+
+}
+
+function MovePlayer(){
+//Build and Destory
+if(MID == 0){
+i = 0
+while(i < MaxBlocks){
+//Build
+if(Block.X[i] == SelX - Xos){if(Block.Y[i] == SelY - Yos){
+
+if(Block.ID[i] == 0){
+
+if (SelOP == 2){
+if(Dirt > 0){Block.ID[i] = 2, Block.Z[i] = 0,Dirt += -1}
+}
+
+if (SelOP == 3){
+if(Sand > 0){Block.ID[i] = 3, Block.Z[i] = 0, Sand += -1}
+}
+
+if (SelOP == 1){
+if(Snow > 0){Block.ID[i] = 1, Block.Z[i] = 0, Snow += -1}
+}
+}
+
+else{
+
+if (Block.ID[i] == 2){
+Block.ID[i] = 0; Block.Z[i] = 16; Dirt += 1
+}
+
+if (Block.ID[i] == 3){
+Block.ID[i] = 0; Block.Z[i] = 16; Sand += 1
+}
+
+if (Block.ID[i] == 1){
+Block.ID[i] = 0; Block.Z[i] = 16; Snow += 1
+}
+
+}
+
+}
+}
+
+i++}
+}
+
+//Move
+if(MID == 1){
+OX = Player.X[0]
+OY = Player.Y[0]
+
+Player.X[0] = SelX
+Player.Y [0] = SelY
+
+WaterP = 1
+i=0
+while(i < MaxBlocks){
+
+if(Block.X[i] <= 1024 - Xos){if(Block.X[i] >= -Xos){
+if(Block.Y[i] <= 768 - Yos-32){if(Block.Y[i] >= -Yos-32){
+
+//Player + Water deny
+if(Block.ID[i] == 0){
+if(Block.X[i] == SelX - Xos && Block.Y[i]  == SelY - Yos+32){message = 100; Player.X[0] = OX, Player.Y[0] = OY, i = MaxBlocks}
+}
+if(Block.ID[i] == 1 && Player.Move[0] == 0){
+if(Block.X[i] == SelX - Xos && Block.Y[i]  == SelY - Yos+32){message = 102; Player.X[0] = OX, Player.Y[0] = OY, i = MaxBlocks}
+}
+if(Block.ID[i] == 3 && Player.Move[1] == 0){
+if(Block.X[i] == SelX - Xos && Block.Y[i]  == SelY - Yos+32){message = 101; Player.X[0] = OX, Player.Y[0] = OY, i = MaxBlocks}
+}
+
+else if(Block.C[i] == 2){
+if(Block.X[i] == SelX - Xos && Block.Y[i]  == SelY - Yos+32){message = Math.floor(noise.simplex2((Block.X[i]) / 2, (Block.Y[i]) / 2)*1.5+2.5); Player.X[0] = OX, Player.Y[0] = OY, i = MaxBlocks}
+}
+
+else if(Block.C[i] == 100){
+if(Block.X[i] == SelX - Xos && Block.Y[i]  == SelY - Yos+32){message = Math.floor(noise.simplex2((Block.X[i]) / 2, (Block.Y[i]) / 2)*0.5+0.5)+204; Player.X[0] = OX, Player.Y[0] = OY, i = MaxBlocks}
+}
+
+else if(Block.C[i] == 200){
+if(Block.X[i] == SelX - Xos && Block.Y[i]  == SelY - Yos+32){message = 6; Player.X[0] = OX, Player.Y[0] = OY, i = MaxBlocks}
+}
+
+else if(Block.C[i] == 1 && Block.X[i] == Player.X[0] - Xos && Block.Y[i] == Player.Y[0] - Yos+32){Score += 1, Block.C[i] = 0}
+
+
+if(Block.ID[i] > 0){
+
+if(Block.ID[i] == 1){
+if(Block.X[i] == SelX - Xos){if(Block.Y[i]  == SelY - Yos+32){Player.Biome[0] = 1;  SelOP = 1; i = MaxBlocks}}
+}
+
+else if(Block.ID[i] == 2){
+if(Block.X[i] == SelX - Xos){if(Block.Y[i]  == SelY - Yos+32){Player.Biome[0] = 2;  SelOP = 2; i = MaxBlocks}}
+}
+
+else if(Block.ID[i] == 3){
+if(Block.X[i] == SelX - Xos){if(Block.Y[i]  == SelY - Yos+32){Player.Biome[0] = 3;  SelOP = 3; i = MaxBlocks}}
+}
+
+}
+
+}}}}
+
+
+i++
+}
+
+if(Player.X[0] >= 1024){
+setTimeout(function(){Xos += (-1024+64)/10; DrawBlocks()},100);
+setTimeout(function(){Xos += (-1024+64)/10; DrawBlocks()},200);
+setTimeout(function(){Xos += (-1024+64)/10; DrawBlocks()},300);
+setTimeout(function(){Xos += (-1024+64)/10; DrawBlocks()},400);
+setTimeout(function(){Xos += (-1024+64)/10; DrawBlocks()},500);
+setTimeout(function(){Xos += (-1024+64)/10; DrawBlocks()},600);
+setTimeout(function(){Xos += (-1024+64)/10; DrawBlocks()},700);
+setTimeout(function(){Xos += (-1024+64)/10; DrawBlocks()},800);
+setTimeout(function(){Xos += (-1024+64)/10; DrawBlocks()},900);
+setTimeout(function(){Xos += (-1024+64)/10; DrawBlocks()},1000);
+Player.X[0] = 64
+}
+
+if(Player.X[0] <= 0){
+setTimeout(function(){Xos += (1024-64)/10; DrawBlocks()},100);
+setTimeout(function(){Xos += (1024-64)/10; DrawBlocks()},200);
+setTimeout(function(){Xos += (1024-64)/10; DrawBlocks()},300);
+setTimeout(function(){Xos += (1024-64)/10; DrawBlocks()},400);
+setTimeout(function(){Xos += (1024-64)/10; DrawBlocks()},500);
+setTimeout(function(){Xos += (1024-64)/10; DrawBlocks()},600);
+setTimeout(function(){Xos += (1024-64)/10; DrawBlocks()},700);
+setTimeout(function(){Xos += (1024-64)/10; DrawBlocks()},800);
+setTimeout(function(){Xos += (1024-64)/10; DrawBlocks()},900);
+setTimeout(function(){Xos += (1024-64)/10; DrawBlocks()},1000);
+Player.X[0] = 1024-64
+}
+
+
+if(Player.Y[0]+64 >= 768){
+setTimeout(function(){Yos += (-768+64)/10; DrawBlocks()},100);
+setTimeout(function(){Yos += (-768+64)/10; DrawBlocks()},200);
+setTimeout(function(){Yos += (-768+64)/10; DrawBlocks()},300);
+setTimeout(function(){Yos += (-768+64)/10; DrawBlocks()},400);
+setTimeout(function(){Yos += (-768+64)/10; DrawBlocks()},500);
+setTimeout(function(){Yos += (-768+64)/10; DrawBlocks()},600);
+setTimeout(function(){Yos += (-768+64)/10; DrawBlocks()},700);
+setTimeout(function(){Yos += (-768+64)/10; DrawBlocks()},800);
+setTimeout(function(){Yos += (-768+64)/10; DrawBlocks()},900);
+setTimeout(function(){Yos += (-768+64)/10; DrawBlocks()},1000);
+setTimeout(function(){Yos = Math.round(Yos); DrawBlocks()},1100);
+Player.Y[0] = 0
+}
+
+if(Player.Y[0]+32 <= 0){
+setTimeout(function(){Yos += (768-64)/10; DrawBlocks()},100);
+setTimeout(function(){Yos += (768-64)/10; DrawBlocks()},200);
+setTimeout(function(){Yos += (768-64)/10; DrawBlocks()},300);
+setTimeout(function(){Yos += (768-64)/10; DrawBlocks()},400);
+setTimeout(function(){Yos += (768-64)/10; DrawBlocks()},500);
+setTimeout(function(){Yos += (768-64)/10; DrawBlocks()},600);
+setTimeout(function(){Yos += (768-64)/10; DrawBlocks()},700);
+setTimeout(function(){Yos += (768-64)/10; DrawBlocks()},800);
+setTimeout(function(){Yos += (768-64)/10; DrawBlocks()},900);
+setTimeout(function(){Yos += (768-64)/10; DrawBlocks()},1000);
+setTimeout(function(){Yos = Math.round(Yos); DrawBlocks()},1100);
+Player.Y[0] = 768-96
+}
+
+if(MID == 0){
+if(Dir == 3){SelX = Player.X[0]+32,SelY = Player.Y[0]+16}
+if(Dir == 2){SelX = Player.X[0]-32,SelY = Player.Y[0]+16}
+if(Dir == 1){SelX = Player.X[0]-32,SelY = Player.Y[0]+48}
+if(Dir == 0){SelX = Player.X[0]+32,SelY = Player.Y[0]+48}
+}
+
+if(MID == 1){
+if(Dir == 0){SelX = Player.X[0]+32,SelY = Player.Y[0]+16}
+if(Dir == 1){SelX = Player.X[0]-32,SelY = Player.Y[0]+16}
+if(Dir == 2){SelX = Player.X[0]-32,SelY = Player.Y[0]-16}
+if(Dir == 3){SelX = Player.X[0]+32,SelY = Player.Y[0]-16}
+}
+
+//DrawBlocks()
+DrawMouse()
+}
+}
+
+
+//Draw Sel Block
+function DrawMouse(){
+var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+
+Offset = 16
+Color = "#FF0000"
+
+//Draw SelBlock
+//Base T
+con.strokeStyle = Color
+con.lineWidth=1;
+con.beginPath();
+con.moveTo(SelX,SelY+SelZ+32);
+con.lineTo(32+SelX,16+SelY+SelZ+32);
+con.lineTo(SelX,32+SelY+SelZ+32);
+con.lineTo(-32+SelX,16+SelY+SelZ+32);
+con.lineTo(SelX,SelY+SelZ+32);
+con.closePath();
+con.stroke();
+
+//Base R
+con.beginPath();
+con.moveTo(32+SelX,16+SelY+SelZ+32);
+con.lineTo(32+SelX,16+SelY+Offset+SelZ+32);
+con.lineTo(SelX,32+SelY+Offset+SelZ+32);
+con.lineTo(SelX,32+SelY+SelZ+32);
+con.closePath();
+con.stroke();
+
+//Base L
+con.beginPath();
+con.moveTo(-32+SelX,16+SelY+SelZ+32);
+con.lineTo(-32+SelX,16+SelY+Offset+SelZ+32);
+con.lineTo(SelX,32+SelY+Offset+SelZ+32);
+con.lineTo(SelX,32+SelY+SelZ+32);
+con.closePath();
+con.stroke();
+}
+
+function DrawInfo(){
+var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+
+if(message > 0){
+con.fillStyle = "white"
+con.fillRect(CenterX/2,CenterY/2,CenterX,CenterY)
+con.fillStyle = "black"
+con.font = "30pt sans-serif";
+
+//Action Warns
+if(message == 100){con.fillText("The power of swimming",CenterX/2,CenterY); con.fillText("is a forbidden power",CenterX/2,CenterY+32)}
+if(message == 101){con.fillText("To enter the islands of sand",CenterX/2,CenterY); con.fillText("you will need the power of",CenterX/2,CenterY+32); con.fillText("sand sheilding",CenterX/2,CenterY+64)}
+if(message == 102){con.fillText("To enter the islands of snow",CenterX/2,CenterY); con.fillText("you will need the power of",CenterX/2,CenterY+32); con.fillText("snow sheilding",CenterX/2,CenterY+64)}
+
+//NPC talk
+if(message == 1){con.fillText("Everyday the islands change",CenterX/2,CenterY); con.fillText("make sure to explore ",CenterX/2,CenterY+32); con.fillText("EVERYDAY",CenterX/2,CenterY+64)}
+if(message == 2){con.fillText("There are two powers",CenterX/2,CenterY); con.fillText("Sand & snow sheilding",CenterX/2,CenterY+32); con.fillText("The wizards can teach you",CenterX/2,CenterY+64); con.fillText("for a price",CenterX/2,CenterY+96)}
+if(message == 3){con.fillText("A map can be viewed by",CenterX/2,CenterY); con.fillText("pressing the middle button",CenterX/2,CenterY+32); con.fillText("on your mouse",CenterX/2,CenterY+64)}
+if(message == 4){con.fillText("Your moves can be viewed by",CenterX/2,CenterY); con.fillText("pressing the E key",CenterX/2,CenterY+32); con.fillText("on your keyboard",CenterX/2,CenterY+64)}
+if(message == 5){con.fillText("There are three power types",CenterX/2,CenterY); con.fillText("sand, dirt, snow",CenterX/2,CenterY+32); con.fillText("each type has ",CenterX/2,CenterY+64); con.fillText("strenghts and weaknesses",CenterX/2,CenterY+96)}
+
+if(message == 6){con.fillText("INDEV",CenterX/2,CenterY); con.fillText("Enemy RPG Battles under testing",CenterX/2,CenterY+32); con.fillText("will replace this text box",CenterX/2,CenterY+64)}
+
+//Wizards
+if(message == 204){
+
+	if(Player.Move[0] == 1){
+	con.fillText("You already know the",CenterX/2,CenterY); 
+	con.fillText("power of snow sheilding",CenterX/2,CenterY+32); 
+	}
+	else{
+
+	if(Score < 100){
+	con.fillText("I can teach you the power of",CenterX/2,CenterY); 
+	con.fillText("snow sheilding for ",CenterX/2,CenterY+32); 
+	con.fillText("100 coins",CenterX/2,CenterY+64)
+	}
+
+	else{
+	con.fillText("I can teach you the power of",CenterX/2,CenterY); 
+	con.fillText("snow sheilding",CenterX/2,CenterY+32); 
+	con.fillText("100 coins",CenterX/2,CenterY+64);
+	con.fillText("Left click to learn",CenterX/2,CenterY+96)
+	Score += -100;
+	Player.Move[0] = 1;
+	}
+
+	}
+
+}
+
+if(message == 205){
+	if(Player.Move[1] == 0){
+
+	if(Score < 100){
+	con.fillText("I can teach you the power of",CenterX/2,CenterY); 
+	con.fillText("sand sheilding for ",CenterX/2,CenterY+32); 
+	con.fillText("100 coins",CenterX/2,CenterY+64)
+	}
+
+	else{
+	con.fillText("I can teach you the power of",CenterX/2,CenterY); 
+	con.fillText("sand sheilding",CenterX/2,CenterY+32); 
+	con.fillText("100 coins",CenterX/2,CenterY+64);
+	con.fillText("Left click to learn",CenterX/2,CenterY+96)
+	Score += -100;
+	Player.Move[1] = 1;
+	}
+
+	}
+
+	else{
+	con.fillText("You already know the",CenterX/2,CenterY); 
+	con.fillText("power of sand sheilding",CenterX/2,CenterY+32); 
+	}
+}
+
+}
+
+
+con.fillStyle = "white"
+con.fillRect(50,732,924,32)
+con.fillStyle = "black"
+con.font = "30pt sans-serif";
+con.fillText("Magic: " + Score + "/" + "100",50,762)
+//con.fillText("Score: " + Score,50,762)
+
+con.fillStyle = "#000000"
+con.fillRect(50,716,924,16)
+
+con.fillStyle = "#FF0000"
+con.fillRect(50,716,924*(Score/(100)),16)
+
+if(SelOP == 2){con.fillStyle = "green"; con.fillText("Dirt: " + Dirt,350,762)} else {con.fillStyle = "black"; con.fillText("Dirt: " + Dirt,350,762)}
+if(SelOP == 3){con.fillStyle = "green"; con.fillText("Sand: " + Sand,550,762)} else {con.fillStyle = "black"; con.fillText("Sand: " + Sand,550,762)}
+if(SelOP == 1){con.fillStyle = "green"; con.fillText("Snow: " + Snow,750,762)} else {con.fillStyle = "black"; con.fillText("Snow: " + Snow,750,762)}
+}
+
+function DrawALLBlocks(A){
+var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+
+con.fillStyle = "#0000FF"
+   con.fillRect(0,0, 1024, 768)
+
+//Offset = (256/MaxR)
+//OrgXos = Xos
+//OrgYos = Yos
+
+i = 0;
+while(i < MaxBlocks){
+if(Block.ID[i] > 0){
+
+if(Block.C[i] == 1){
+if(Block.ID[i] == 1){con.fillStyle = "#00FFFF"}
+else if(Block.ID[i] == 2){con.fillStyle = "#FF0000"}
+else if(Block.ID[i] == 3){con.fillStyle = "#FF8F00"}
+con.fillRect(Block.X[i]/MOffset+1024/2-48-16+MXos,Block.Y[i]/MOffset+768/2-36+MYos,32/MOffset,32/MOffset)
+}
+
+else if(Block.C[i] == 100){
+con.fillStyle = "#FF00FF"
+con.fillRect(Block.X[i]/MOffset+1024/2-48-16+MXos,Block.Y[i]/MOffset+768/2-36+MYos,32/MOffset,32/MOffset)
+}
+
+else if(Block.C[i] == 200){
+con.fillStyle = "#000000"
+con.fillRect(Block.X[i]/MOffset+1024/2-48-16+MXos,Block.Y[i]/MOffset+768/2-36+MYos,32/MOffset,32/MOffset)
+}
+
+else{
+
+if(Block.ID[i] == 2){con.fillStyle = "#00FF00"}
+else if (Block.ID[i] == 3){con.fillStyle = "#FFFF00"}
+else if (Block.ID[i] == 1){con.fillStyle = "#FFFFFF"}
+
+con.fillRect(Block.X[i]/MOffset+1024/2-48-16+MXos,Block.Y[i]/MOffset+768/2-36+MYos,32/MOffset,32/MOffset)
+}
+
+}
+
+i++;
+}
+
+document.onmousedown = function(event){
+if(event.button == 0){MOffset += -0.5; DrawALLBlocks(0)}
+if(event.button == 1){DrawBlocks(); ResetMouseFunc(); ResetKeyFunc();}
+if(event.button == 2){MOffset += 0.5; DrawALLBlocks(0)}
+}
+
+document.onkeydown = function(event){
+//Up
+if(event.keyCode == 83 || event.keyCode == 40){MYos += -8; DrawALLBlocks(0)}
+//Left
+if(event.keyCode == 65 || event.keyCode == 37){MXos += 8; DrawALLBlocks(0)}
+//Down
+if(event.keyCode == 87 || event.keyCode == 38){MYos += 8; DrawALLBlocks(0)}
+//Right
+if(event.keyCode == 68 || event.keyCode == 39){MXos += -8; DrawALLBlocks(0)}
+
+}
+
+//Xos = OrgXos
+//Yos = OrgYos
+}
+
+function DrawBlocks(){
+var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+
+con.fillStyle = "black";
+   con.fillRect(0,0, 1024, 768)
+
+Offset = 32;
+
+i = 0
+while(i < MaxBlocks){
+
+if(Block.X[i] <= 1024 - Xos){if(Block.X[i] >= -Xos){
+if(Block.Y[i] <= 768 - Yos-32){if(Block.Y[i] >= -Yos-32){
+
+//Water
+if (Block.ID[i] == 0){
+//Base T
+con.fillStyle = "#0000FF"
+con.beginPath();
+con.moveTo(Block.X[i]*(Offset/32)+Xos,Block.Y[i]*(Offset/32)+Yos+Block.Z[i]*(Offset/32));
+con.lineTo(Offset+Block.X[i]*(Offset/32)+Xos,Offset/2+Block.Y[i]*(Offset/32)+Yos+Block.Z[i]*(Offset/32));
+con.lineTo(Block.X[i]*(Offset/32)+Xos,Offset+Block.Y[i]*(Offset/32)+Yos+Block.Z[i]*(Offset/32));
+con.lineTo(-Offset+Block.X[i]*(Offset/32)+Xos,Offset/2+Block.Y[i]*(Offset/32)+Yos+Block.Z[i]*(Offset/32));
+//con.lineTo(Block.X[i]*(Offset/32)+Xos,Block.Y[i]*(Offset/32)+Yos+Block.Z[i]*(Offset/32));
+con.closePath();
+con.fill();
+}
+
+//Grass
+else if (Block.ID[i] == 2){
+CT = "#00FF00"
+CL = "#8B4513"
+CR = "#A0522D"
+}
+
+//Sand
+else if (Block.ID[i] == 3){
+CT = "#FFFF00"
+CL = "#AFAF00"
+CR = "#CFCF00"
+}
+
+//Snow
+else if (Block.ID[i] == 1){
+CT = "#FFFFFF"
+CL = "#AFAFAF"
+CR = "#CFCFCF"
+}
+
+if(Block.ID[i] > 0){
+//Base T
+con.fillStyle = CT
+con.beginPath();
+con.moveTo(Block.X[i]*(Offset/32)+Xos,Block.Y[i]*(Offset/32)+Yos+Block.Z[i]);
+con.lineTo(Offset+Block.X[i]*(Offset/32)+Xos,Offset/2+Block.Y[i]*(Offset/32)+Yos+Block.Z[i]);
+con.lineTo(Block.X[i]*(Offset/32)+Xos,Offset+Block.Y[i]*(Offset/32)+Yos+Block.Z[i]);
+con.lineTo(-Offset+Block.X[i]*(Offset/32)+Xos,Offset/2+Block.Y[i]*(Offset/32)+Yos+Block.Z[i]);
+//con.lineTo(Block.X[i]*(Offset/32)+Xos,Block.Y[i]*(Offset/32)+Yos+Block.Z[i]);
+con.closePath();
+con.fill();
+
+//Base R
+con.fillStyle = CR
+con.beginPath();
+con.moveTo(Offset+Block.X[i]*(Offset/32)+Xos,Offset/2+Block.Y[i]*(Offset/32)+Yos+Block.Z[i]);
+con.lineTo(Offset+Block.X[i]*(Offset/32)+Xos,Offset/2+Block.Y[i]*(Offset/32)+Yos+Offset+Block.Z[i]);
+con.lineTo(Block.X[i]*(Offset/32)+Xos,Offset+Block.Y[i]*(Offset/32)+Yos+Offset+Block.Z[i]);
+con.lineTo(Block.X[i]*(Offset/32)+Xos,Offset+Block.Y[i]*(Offset/32)+Yos+Block.Z[i]);
+con.closePath();
+con.fill();
+
+//Base L
+con.fillStyle = CL
+con.beginPath();
+con.moveTo(-Offset+Block.X[i]*(Offset/32)+Xos,Offset/2+Block.Y[i]*(Offset/32)+Yos+Block.Z[i]);
+con.lineTo(-Offset+Block.X[i]*(Offset/32)+Xos,Offset/2+Block.Y[i]*(Offset/32)+Yos+Offset+Block.Z[i]);
+con.lineTo(Block.X[i]*(Offset/32)+Xos,Offset+Block.Y[i]*(Offset/32)+Yos+Offset+Block.Z[i]);
+con.lineTo(Block.X[i]*(Offset/32)+Xos,Offset+Block.Y[i]*(Offset/32)+Yos+Block.Z[i]);
+con.closePath();
+con.fill();
+
+//Draw Coin
+if(Block.C[i] == 1){
+
+if(Block.ID[i] == 1){con.fillStyle = "#00FFFF"}
+if(Block.ID[i] == 2){con.fillStyle = "#FF0000"}
+if(Block.ID[i] == 3){con.fillStyle = "#FF8F00"}
+con.strokeStyle = "#000000"
+
+con.beginPath();
+con.arc(Block.X[i]+Xos,Block.Y[i]+Yos+16,8,0,2*Math.PI);
+con.fill();
+con.stroke();
+}
+
+if(Block.C[i] == 2){
+
+if(Block.ID[i] == 2){
+CT = "#FF0000"
+CL = "#AF0000"
+CR = "#DF0000"
+}
+
+if(Block.ID[i] == 3){
+CT = "#FF8F00"
+CL = "#AF6F00"
+CR = "#DF8F00"
+}
+
+if(Block.ID[i] == 1){
+CT = "#00FFFF"
+CL = "#00AFAF"
+CR = "#00DFDF"
+}
+
+//Base T
+con.fillStyle = CT
+con.beginPath();
+con.moveTo(Block.X[i]+Xos,Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(-16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+//con.lineTo(Block.X[i]+Xos,Block.Y[i]+Yos+Block.Z[i]-24);
+//con.closePath();
+con.fill();
+
+Offset = 32
+//Base R
+con.fillStyle = CR
+con.beginPath();
+con.moveTo(16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Block.Z[i]-24);
+//con.closePath();
+con.fill();
+
+//Base L
+con.fillStyle = CL
+con.beginPath();
+con.moveTo(-16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(-16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Block.Z[i]-24);
+//con.closePath();
+con.fill();
+}
+
+if(Block.C[i] == 200){
+
+CT = "#000000"
+CL = "#0F0F0F"
+CR = "#2F2F2F"
+
+//Base T
+con.fillStyle = CT
+con.beginPath();
+con.moveTo(Block.X[i]+Xos,Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(-16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+//con.lineTo(Block.X[i]+Xos,Block.Y[i]+Yos+Block.Z[i]-24);
+//con.closePath();
+con.fill();
+
+Offset = 32
+//Base R
+con.fillStyle = CR
+con.beginPath();
+con.moveTo(16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Block.Z[i]-24);
+//con.closePath();
+con.fill();
+
+//Base L
+con.fillStyle = CL
+con.beginPath();
+con.moveTo(-16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(-16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Block.Z[i]-24);
+//con.closePath();
+con.fill();
+}
+
+if(Block.C[i] == 100){
+
+CT = "#FF00FF"
+CL = "#AF00AF"
+CR = "#DF00DF"
+
+//Base T
+con.fillStyle = CT
+con.beginPath();
+con.moveTo(Block.X[i]+Xos,Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(-16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+//con.lineTo(Block.X[i]+Xos,Block.Y[i]+Yos+Block.Z[i]-24);
+//con.closePath();
+con.fill();
+
+Offset = 32
+//Base R
+con.fillStyle = CR
+con.beginPath();
+con.moveTo(16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Block.Z[i]-24);
+//con.closePath();
+con.fill();
+
+//Base L
+con.fillStyle = CL
+con.beginPath();
+con.moveTo(-16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Block.Z[i]-24);
+con.lineTo(-16+Block.X[i]+Xos,8+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Offset+Block.Z[i]-24);
+con.lineTo(Block.X[i]+Xos,16+Block.Y[i]+Yos+Block.Z[i]-24);
+//con.closePath();
+con.fill();
+}
+
+
+}
+
+//i++;
+}}}}
+
+i++;
+}
+DrawPlayer()
+DrawInfo()
+}
+
+function DrawPlayer(){
+var drawing = document.getElementById("drawing");
+   var con = drawing.getContext("2d");
+
+if(Player.Biome == 2){
+CT = "#FF0000"
+CL = "#AF0000"
+CR = "#DF0000"
+}
+
+if(Player.Biome == 3){
+CT = "#FF0000"
+CL = "#AF6F00"
+CR = "#DF8F00"
+}
+
+if(Player.Biome == 1){
+CT = "#FF0000"
+CL = "#00AFAF"
+CR = "#00DFDF"
+}
+
+//Base T
+con.fillStyle = CT
+con.beginPath();
+con.moveTo(Player.X[0],Player.Y[0]+Player.Z[0]+8);
+con.lineTo(16+Player.X[0],8+Player.Y[0]+Player.Z[0]+8);
+con.lineTo(Player.X[0],16+Player.Y[0]+Player.Z[0]+8);
+con.lineTo(-16+Player.X[0],8+Player.Y[0]+Player.Z[0]+8);
+con.lineTo(Player.X[0],Player.Y[0]+Player.Z[0]+8);
+con.closePath();
+con.fill();
+
+Offset = 32
+//Base R
+con.fillStyle = CR
+con.beginPath();
+con.moveTo(16+Player.X[0],8+Player.Y[0]+Player.Z[0]+8);
+con.lineTo(16+Player.X[0],8+Player.Y[0]+Offset+Player.Z[0]+8);
+con.lineTo(Player.X[0],16+Player.Y[0]+Offset+Player.Z[0]+8);
+con.lineTo(Player.X[0],16+Player.Y[0]+Player.Z[0]+8);
+con.closePath();
+con.fill();
+
+//Base L
+con.fillStyle = CL
+con.beginPath();
+con.moveTo(-16+Player.X[0],8+Player.Y[0]+Player.Z[0]+8);
+con.lineTo(-16+Player.X[0],8+Player.Y[0]+Offset+Player.Z[0]+8);
+con.lineTo(Player.X[0],16+Player.Y[0]+Offset+Player.Z[0]+8);
+con.lineTo(Player.X[0],16+Player.Y[0]+Player.Z[0]+8);
+con.closePath();
+con.fill();
+}
+
+ </script>
+  </head>
+  <body onload = "GenWorld()">
+  <canvas id = "drawing"
+    height = "768"
+    width = "1024">
+   <p>Canvas not supported! </p>
+  </canvas>
+  </body>
+  </html>
