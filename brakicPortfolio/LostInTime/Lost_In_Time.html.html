@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<textarea readOnly id="Output" cols="120" rows="45"></textarea>
+		
+
+
+</head>
+<body>
+	<h1></h1>
+	<textarea id="InputText" cols="120" rows="1" placeholder="What will you do?" onkeypress="press(event)" onkeyup="inputCheck()" autofocus></textarea>
+	<button type="button" id="InputButton" onclick="submitToTextarea()">Submit</button><br>
+	<textarea readOnly id="UserInput" cols="120" rows="1" placeholder="Your input will be put here so you can see what you entered."></textarea>
+	<script src="LIT_Dependants.js"></script>
+	<script src="LIT_Functions.js"></script>
+	<script>
+		src="LIT_Dependants.js"
+		src="LIT_Functions.js"
+		//When the user presses the enter key without holding down the shift key, it will move the input text to the history textarea "UserInput" and clears the input textarea "InputText", then gives the variable UserInput a value.
+		function press(event) {
+			if (event.keyCode == 13 && !event.shiftKey) {
+				event.preventDefault();
+				submitToTextarea();
+				return true;
+			}
+			function submitToTextarea() {
+				document.getElementById("UserInput").value = document.getElementById("InputText").value;
+				document.getElementById("InputText").value = "";
+			}
+			UserInput = document.getElementById("UserInput").value;
+		}
+		function inputCheck() {
+			UserInput = document.getElementById("UserInput").value;
+			if ((UserInput.toLowerCase().includes(direction[0])) || (UserInput.toLowerCase().includes(direction[1])) || (UserInput.toLowerCase().includes(direction[2])) || (UserInput.toLowerCase().includes(direction[3])) && (UserInput.toLowerCase().includes(examineActions[0]) === false) && (UserInput.toLowerCase().includes(examineActions[1]) === false) && (UserInput.toLowerCase().includes(examineActions[2]) === false)) {
+				if (UserInput.toLowerCase().includes(direction[0]) && this[thisRoom].canGoNorth) {
+					goNorth();
+				} else if (UserInput.toLowerCase().includes(direction[2]) && this[thisRoom].canGoSouth) {
+					goSouth();
+					if (this[thisRoom].id === 1400) {
+						document.getElementById("Output").value = this[thisRoom].desc;
+						gameWin = true;
+					}
+				} else if (UserInput.toLowerCase().includes(direction[1]) && this[thisRoom].canGoEast) {
+					goEast();
+				} else if (UserInput.toLowerCase().includes(direction[3]) && this[thisRoom].canGoWest) {
+					goWest();
+				}
+			} else {
+				console.log(thisRoom);
+				examineCheck(); 
+					console.log("examineCheck");
+					if (check === true) {
+						console.log("check if is true");
+						if (compareRoomCheck()) {//checks if user wishes to examine the room
+							if ((document.getElementById("Output").value).includes(this[thisRoom].examine)) {//prevents multiple lines from being entered into "Output" textarea
+								return;
+							} else {
+								if (this[thisRoom].examine===undefined) {
+									return;
+								} else {
+									document.getElementById("Output").value += "\n" + (this[thisRoom].examine);
+								}
+							}
+						} else if (compareEastSign()) {//checks if user wishes to examine the east sign in room 1301
+							if ((document.getElementById("Output").value).includes(this[thisRoom].eastSign)) {
+								return;
+							} else {
+								if (this[thisRoom].eastSign===undefined) {
+									if ((document.getElementById("Output").value).includes("\n\n    This room has no east sign to examine")) {
+								return;
+									} else {
+									document.getElementById("Output").value += "\n\n    This room has no east sign to examine";
+									}
+								} else {
+									document.getElementById("Output").value += "\n" + (this[thisRoom].eastSign);
+								}
+							}
+						} else if (compareWestSign()) {//checks if user wishes to examine the west sign in room 1301
+							if ((document.getElementById("Output").value).includes(this[thisRoom].westSign)) {
+								return
+							} else {
+								if (this[thisRoom].westSign===undefined) {
+									if ((document.getElementById("Output").value).includes("\n\n    This room has no west sign to examine")) {
+										return;
+									} else {
+										document.getElementById("Output").value += "\n\n    This room has no west sign to examine";
+									}
+								} else {
+									document.getElementById("Output").value += "\n" + (this[thisRoom].westSign);
+								}
+							}
+						} else if (compareTrees()) {//checks if user wishes to examine the trees in room 1401
+							if ((document.getElementById("Output").value).includes(this[thisRoom].examineTrees)) {
+								return;
+							} else {
+								if (this[thisRoom].examineTrees===undefined) {
+									if ((document.getElementById("Output").value).includes("\n\n    This room has no trees to examine")) {
+								return;
+									} else {
+									document.getElementById("Output").value += "\n\n    This room has no trees to examine";
+									}
+								} else {
+									document.getElementById("Output").value += "\n" + (this[thisRoom].examineTrees);
+								}
+							}
+						} else if (compareTreeHollows()) {//checks if the user wishes to examine the tree hollows in room 1401
+							if ((document.getElementById("Output").value).includes(this[thisRoom].examineTreeHollows)) {
+								return;
+							} else {
+								if (this[thisRoom].examineTreeHollows===undefined) {
+									if ((document.getElementById("Output").value).includes("\n\n    This room has no tree hollows to examine")) {
+								return;
+									} else {
+										document.getElementById("Output").value += "\n\n    This room has no tree hollows to examine";
+									}
+								} else {
+									document.getElementById("Output").value += "\n" + (this[thisRoom].examineTreeHollows);
+								}
+							}
+						} else if ((UserInput.toLowerCase()).includes("backpack") && ((document.getElementById("Output").value.includes("\n\nYour backpack has:\n    "+playerBackpack[0]+", "+playerBackpack[1]+", "+playerBackpack[2]+", "+playerBackpack[3]+", "+playerBackpack[4]+", "+playerBackpack[5]+".")) === false)) {
+							document.getElementById("Output").value += "\n\nYour backpack has:\n    "+playerBackpack[0]+", "+playerBackpack[1]+", "+playerBackpack[2]+", "+playerBackpack[3]+", "+playerBackpack[4]+", "+playerBackpack[5]+".";
+						} else if ((UserInput.toLowerCase()).includes("pocket") && (UserInput.toLowerCase()).includes("pockets") && ((document.getElementById("Output").value.includes("\n\nYour pockets have:\n    "+playerPockets[0]+", "+playerPockets[1]+", "+playerPockets[2]+", "+playerPockets[3]+", "+playerPockets[4]+".")) === false )) {
+							document.getElementById("Output").value += "\n\nYour pockets have:\n    "+playerPockets[0]+", "+playerPockets[1]+", "+playerPockets[2]+", "+playerPockets[3]+", "+playerPockets[4]+".";
+						}
+					
+				} else {
+					compareTake();
+					console.log("compareTake");
+						if (checkTake === true) {
+								checkTake = false;
+							console.log("take check true");
+							if (takeSmallBox()) {
+								console.log("take small box");
+								if ((this[thisRoom].smallBox==="taken") && (this[thisRoom].id===1401)) {
+									return;
+								} else {
+									document.getElementById("Output").value += (takeSmallBoxOutput);
+									playerPockets[0] = "Small Hook";
+									this[thisRoom].smallBox = "taken";
+								}
+							} else {
+								console.log("takeSmallBox not true");
+							}
+				}
+				interactCheck();
+				if (interact === true) {
+					console.log("interactCheck");
+					if (useSmallHook()) {
+						if ((UserInput.toLowerCase()).includes("west sign")) {
+							if (((document.getElementById("Output").value).includes(this[thisRoom].westSignHook)) || (this[thisRoom].westSignHook === undefined)) {
+								return;
+							} else {
+								document.getElementById("Output").value += this[thisRoom].westSignHook;
+								playerPockets[1] = "Rose Key";
+								this[thisRoom].westSignHook = undefined;
+							}
+						} else {
+							return;
+						}
+					} else if (useRoseKey()) {
+						if ((UserInput.toLowerCase()).includes("lock") || (UserInput.toLowerCase()).includes("lockpad") && (this[thisRoom].lockpadStatus === "locked" && ((document.getElementById("Output").value).includes(this[thisRoom].openRoseLock === false)))) {
+							this[thisRoom].lockpadStatus = "unlocked";
+							this[thisRoom].canGoSouth = true;
+							playerPockets[1] = "Empty Slot";
+						}
+					}
+				}
+			}
+		}
+	}
+			
+		
+		posX = 13;
+		posY = 0;
+		//testing textareas
+		//Start screen text
+		document.getElementById("Output").value = "Welcome to Lost To Time. \nOnce you are ready to start, enter a command in the lower text box to begin the game.";
+		var UserInputInt = setInterval(setUserInput, 100);
+		//Every 10 seconds, repeats the second line of text from the above code
+		var build = setInterval(startScreen, 10000);
+		//Once the user inputs a start command, both intervals are cleared, then INTRODUCTION_PROMPT is set into the "Output" textarea
+		var stopBuild = setInterval(endStart, 100);
+		thisRoom = ("Room"+(roomID)+"");
+		
+	
+	</script>
+</body>
+</html>
