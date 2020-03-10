@@ -1,0 +1,59 @@
+body{background-image: url(img/ci.jpg);
+    background-size: 500px;
+    color: #000000; 
+    text-align: left;
+    padding-left: 30%;
+    padding-right: 30%;
+}
+
+body{
+    color: #ffffff;
+}
+
+h1{background-color: #97747400;
+    text-align: center;}
+
+a:link, a:visited, a:hover, a:active{text-decoration: none; 
+    background-color: #ffffff00; 
+    color: #74efff;}
+
+a:hover{color: #ff0000;}
+
+main{background-color: #093a63e7;
+    padding: 7%;
+}
+
+nav{background-color: #4529c2;}
+
+#Apis{text-align: center;}
+
+img{max-width:100%;}
+
+.search-button{
+    background: #ffffff;
+    padding: 0;
+    width: 23px;
+    height: 23px;
+    color: white;
+    transform: translate(-25%,6px);
+}
+
+table{
+    background-color: crimson;
+}
+
+tr{
+    background-color: #48ff54;
+    color: #000000;
+}
+
+#drop{
+    position: absolute;
+    background-color: #ffffff;
+    display: none;
+    margin: 0;
+    padding: 7px;
+    margin-top: 4px;
+}
+
+#con:hover #drop{display: block;}
